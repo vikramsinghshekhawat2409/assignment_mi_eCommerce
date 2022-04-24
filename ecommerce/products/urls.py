@@ -3,5 +3,6 @@ from .views import *
 
 router = routers.SimpleRouter()
 router.register(r'category', CategoryViewset)
+router.register(r'subcategory', SubCategoryViewset)
 
 urlpatterns = router.urls

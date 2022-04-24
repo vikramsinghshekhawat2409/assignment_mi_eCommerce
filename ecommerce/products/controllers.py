@@ -20,3 +20,21 @@ class CategoryController:
 
         return success, msg, categories_data
 
+
+class SubCategoryController:
+
+    def get_all_subcategories_details(self, request):
+        success = False
+        sub_categories_data = {}
+        msg = "Error in fetching all sub-categories"
+        try:
+            obj = SubCategories.objects.filter()
+            serializer = SubCategorySerializer(obj, many=True)
+            sub_categories_data = serializer.data
+            success = True
+            msg = "Success in getting all sub-categories"
+        except Exception as e:
+            exception_detail
+
+        return success, msg, sub_categories_data
+

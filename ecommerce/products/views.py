@@ -19,5 +19,19 @@ class CategoryViewset(viewsets.ViewSet, CategoryController):
             res_dict = get_response_object(success, msg, data)
         except Exception as ex:
             exception_detail()
-            res_dict = get_response_object(False, 'Error in getting train data')
+            res_dict = get_response_object(False, 'Error in getting categories data')
+        return Response(res_dict, status=status.HTTP_200_OK)
+
+
+class SubCategoryViewset(viewsets.ViewSet, SubCategoryController):
+    queryset = SubCategories.objects.all()
+
+    @action(detail=False, methods=['GET'], url_path='all')
+    def get_all_subcategories(self, request):
+        try:
+            success, msg, data = self.get_all_subcategories_details(request)
+            res_dict = get_response_object(success, msg, data)
+        except Exception as e:
+            exception_detail
+            res_dict = get_response_object(False,'Error in getting all subcategories')
         return Response(res_dict, status=status.HTTP_200_OK)

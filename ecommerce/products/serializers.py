@@ -12,3 +12,12 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Categories
 
 
+class SubCategorySerializer(serializers.ModelSerializer):
+    sub_category_id = serializers.IntegerField(source='id')
+    sub_category = serializers.CharField(source='name')
+    category = serializers.CharField(source='category.name')
+
+    class Meta:
+        fields = ('sub_category_id', 'sub_category', 'category')
+        model = SubCategories
+
