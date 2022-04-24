@@ -32,6 +32,17 @@ class SubCategoryViewset(viewsets.ViewSet, SubCategoryController):
             success, msg, data = self.get_all_subcategories_details(request)
             res_dict = get_response_object(success, msg, data)
         except Exception as e:
-            exception_detail
-            res_dict = get_response_object(False,'Error in getting all subcategories')
+            exception_detail()
+            res_dict = get_response_object(False, 'Error in getting all subcategories')
         return Response(res_dict, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'], url_path='by_category')
+    def get_sub_category_by_category(self, request):
+        try:
+            success, msg, data = self.get_sub_category_by_category_details(request)
+            res_dict = get_response_object(success, msg, data)
+        except Exception as e:
+            exception_detail
+            res_dict = get_response_object(False, 'Error in getting subcategories by category')
+        return Response(res_dict, status=status.HTTP_200_OK)
+

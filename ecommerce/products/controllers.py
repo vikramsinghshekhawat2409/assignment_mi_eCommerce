@@ -34,7 +34,24 @@ class SubCategoryController:
             success = True
             msg = "Success in getting all sub-categories"
         except Exception as e:
-            exception_detail
+            exception_detail()
+
+        return success, msg, sub_categories_data
+
+    def get_sub_category_by_category_details(self, request):
+        success = False
+        sub_categories_data = {}
+        msg = "Error in fetching sub-categories by a category"
+        try:
+            category = request.GET.get('category', False)
+            if category:
+                obj = SubCategories.objects.filter(category__name=category)
+                serializer = SubCategorySerializer(obj, many=True)
+                sub_categories_data = serializer.data
+                success = True
+                msg = "Success in getting sub-categories by category"
+        except Exception as e:
+            exception_detail()
 
         return success, msg, sub_categories_data
 

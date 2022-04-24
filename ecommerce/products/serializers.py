@@ -1,6 +1,5 @@
 from .models import *
 from rest_framework import serializers
-from ecommerce.utility import exception_detail
 
 
 class CategorySerializer(serializers.ModelSerializer):
