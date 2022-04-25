@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Products</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+	<script type="text/javascript">
+    $(document).ready(function() {
+<!--        $('#example').DataTable();-->
+    } );
+    </script>
+
+</head>
+<body>
+<div class="container">
+    <div class="row mt-5">
+        <button id="add_btn" type="button" class="btn btn-primary">Add Product</button>
+    </div>
+    <div class="row" style="display: inline">
+
+				<table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Product</th>
+							<th>Subcategory</th>
+							<th>Category</th>
+						</tr>
+					</thead>
+                    <tbody>
+
+                    </tbody>
+                    <tfoot>
+
+                    </tfoot>
+                </table>
+    </div>
+</div>
+</body>
+<script>
+/*
+// Added some javascript/jQuery functions for fetching data from db, showing them in table and adding some data to db
+*/
+let subcategories = "";
+let categories = "";
+window.CSRF_TOKEN = "{{ csrf_token }}"
+$.ajax({
+  "url": "products/all",
+  "method": "GET",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}).done(function (response) {
+  if(response.status){
+    if(response.hasOwnProperty('data')){
+        tableBody = $("#example tbody");
+        response.data.forEach(element => {
+            let markup = "<tr>"
+            markup+="<td> </td>"
+            markup+= "<td>" + element.product + "</td>"
+            markup+= "<td>" + element.sub_category + "</td>"
+            markup+= "<td>" + element.category + "</td>"
+            markup+="</tr>"
+            tableBody.append(markup);
+        });
+        $(document).ready(function() {
+            $('#example').DataTable({
+                responsive: true
+            });
+            $('#example_wrapper').removeClass('form-inline');
+            $("#example_wrapper").attr("width","100%");
+    } );
+    }
+
+  }
+});
+
+$.ajax({
+  "url": "subcategory/all",
+  "method": "GET",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}).done(function (response) {
+    if(response.status){
+        if(response.hasOwnProperty('data')){
+            subcategories+='<select id="sub_cat_select" onchange=on_sub_cat_change(this) class="form-select">'
+            response.data.forEach(element => {
+                subcategories+='<option category="'+ element.category +'" value="'+ element.sub_category_id +'">'+ element.sub_category + '</option>'
+            });
+            subcategories+='</select>'
+        }
+    }
+});
+
+$.ajax({
+  "url": "category/all",
+  "method": "GET",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}).done(function (response) {
+    if(response.status){
+        if(response.hasOwnProperty('data')){
+            categories+='<select id="cat_select" disabled class="form-select">'
+            response.data.forEach(element => {
+                categories+='<option value="'+ element.category +'">'+ element.category + '</option>'
+            });
+            categories+='</select>'
+        }
+    }
+});
+
+
+function on_sub_cat_change(event){
+        let category = $('#sub_cat_select :selected').attr('category')
+        $('#cat_select').val(category).change()
+    }
+
+function on_cat_change(event){
+        let category = $('#sub_cat_select :selected')
+    }
+
+
+$('#add_btn').click(function(){
+    tableBody = $("#example tbody");
+    let markup = "<tr>"
+    markup+='<td><button id="save_btn" type="button" onclick=save_btn_clicked(this) class="btn save_btn btn-info">SAVE</button></td>'
+    markup+='<td><input autocomplete="off" id="product" type="text" class="form-control" placeholder="product name" aria-label="Product" aria-describedby="basic-addon1"></td>'
+    markup+= '<td>'+ subcategories +'</td>'
+    markup+= '<td>'+ categories +'</td>'
+    markup+="</tr>"
+    tableBody.append(markup);
+    let category = $('#sub_cat_select :selected').attr('category')
+    $('#cat_select').val(category).change()
+});
+
+function save_btn_clicked(event){
+    product = $('#product').val()
+    if(product != ''){
+        subcategory = parseInt($('#sub_cat_select').val())
+        $.ajax({
+          "url": "products/add/?sub-category="+subcategory+"&product="+product,
+           data: {csrfmiddlewaretoken: window.CSRF_TOKEN},
+          "method": "POST",
+          "timeout": 0,
+        }).done(function (response) {
+          if(response.status){
+            tableBody = $("#example tbody tr:last");
+            let markup = "<tr>"
+            markup+="<td> </td>"
+            markup+= "<td>" + product + "</td>"
+            markup+= "<td>" + $('#sub_cat_select :selected').text() + "</td>"
+            markup+= "<td>" + $('#cat_select :selected').text() + "</td>"
+            markup+="</tr>"
+            tableBody.before(markup);
+            $('#product').val('').change();
+          }
+        });
+    }else window.alert('Enter product name','Ok');
+}
+</script>
+</html>
